@@ -1,0 +1,19 @@
+// Regresi linear: mempelajari y = 2*x1 + 3*x2 + 1.
+// Jalankan: tenun run examples/regresi_linear.tenun
+impor "../src/belajar.tenun";
+
+biar X: [][]desimal = [[1.0, 1.0], [2.0, 0.0], [0.0, 3.0], [3.0, 2.0], [4.0, 1.0]];
+biar y: []desimal = [6.0, 5.0, 10.0, 13.0, 12.0];
+
+biar model: []desimal = reg_model_baru(2);
+biar mse: desimal = reg_linear_latih(model, X, y, 2000, 0.02);
+
+cetak("MSE akhir:");
+cetak(mse);
+cetak("bias, w1, w2 (harusnya ~1, 2, 3):");
+cetak(model[0]);
+cetak(model[1]);
+cetak(model[2]);
+
+cetak("prediksi untuk [5, 5] (harusnya ~26):");
+cetak(reg_linear_prediksi(model, [5.0, 5.0]));

@@ -1,0 +1,10 @@
+{
+  "nama": "belajar",
+  "versi": "0.1.0",
+  "deskripsi": "Pustaka pembelajaran mesin untuk Tenun: aljabar linear, regresi, jaringan saraf (MLP + backprop), k-NN, dan k-means.",
+  "lisensi": "MIT",
+  "penulis": "TenunLang",
+  "berkas": "src/belajar.tenun",
+  "kataKunci": ["machine-learning", "ml", "neural-network", "mlp", "backprop", "regresi", "knn", "kmeans", "matriks"],
+  "butuh": {}
+}

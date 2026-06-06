@@ -1,0 +1,74 @@
+// utils/stat.tenun
+// Statistik deskriptif & pembantu evaluasi.
+
+fungsi stat_rata(v: []desimal): desimal {
+    biar s: desimal = 0.0;
+    untuk i dari 0 sampai panjang(v) { s = s + v[i]; }
+    kembali s / desimalDari(panjang(v));
+}
+
+fungsi stat_varian(v: []desimal): desimal {
+    biar m: desimal = stat_rata(v);
+    biar s: desimal = 0.0;
+    untuk i dari 0 sampai panjang(v) {
+        biar d: desimal = v[i] - m;
+        s = s + d * d;
+    }
+    kembali s / desimalDari(panjang(v));
+}
+
+fungsi stat_stdev(v: []desimal): desimal {
+    kembali akar(stat_varian(v));
+}
+
+fungsi stat_min(v: []desimal): desimal {
+    biar m: desimal = v[0];
+    untuk i dari 1 sampai panjang(v) { kalau v[i] < m { m = v[i]; } }
+    kembali m;
+}
+
+fungsi stat_maks(v: []desimal): desimal {
+    biar m: desimal = v[0];
+    untuk i dari 1 sampai panjang(v) { kalau v[i] > m { m = v[i]; } }
+    kembali m;
+}
+
+// indeks elemen terbesar (argmax) -- untuk memilih kelas dari skor.
+fungsi stat_argmaks(v: []desimal): bulat {
+    biar idx: bulat = 0;
+    biar m: desimal = v[0];
+    untuk i dari 1 sampai panjang(v) {
+        kalau v[i] > m { m = v[i]; idx = i; }
+    }
+    kembali idx;
+}
+
+// normalisasi z-score: (x - rata) / stdev.
+fungsi stat_normalisasi(v: []desimal): []desimal {
+    biar m: desimal = stat_rata(v);
+    biar sd: desimal = stat_stdev(v);
+    kalau sd == 0.0 { sd = 1.0; }
+    biar r: []desimal = [];
+    untuk i dari 0 sampai panjang(v) { r = dorong(r, (v[i] - m) / sd); }
+    kembali r;
+}
+
+// penskalaan min-max ke rentang [0, 1].
+fungsi stat_minmax(v: []desimal): []desimal {
+    biar lo: desimal = stat_min(v);
+    biar hi: desimal = stat_maks(v);
+    biar rentang: desimal = hi - lo;
+    kalau rentang == 0.0 { rentang = 1.0; }
+    biar r: []desimal = [];
+    untuk i dari 0 sampai panjang(v) { r = dorong(r, (v[i] - lo) / rentang); }
+    kembali r;
+}
+
+// akurasi klasifikasi: bagian label prediksi yang cocok dengan target.
+fungsi stat_akurasi(pred: []desimal, target: []desimal): desimal {
+    biar tepat: desimal = 0.0;
+    untuk i dari 0 sampai panjang(pred) {
+        kalau pred[i] == target[i] { tepat = tepat + 1.0; }
+    }
+    kembali tepat / desimalDari(panjang(pred));
+}

@@ -1,0 +1,40 @@
+// utils/data.tenun
+// Pembantu penyiapan data: one-hot, acak-urut, bagi latih/uji, jarak.
+
+// vektor one-hot panjang `kelas` dengan 1.0 pada posisi `label`.
+fungsi data_satu_panas(label: bulat, kelas: bulat): []desimal {
+    biar v: []desimal = vek_nol(kelas);
+    v[label] = 1.0;
+    kembali v;
+}
+
+// jarak Euclidean antar dua vektor.
+fungsi data_jarak(a: []desimal, b: []desimal): desimal {
+    biar s: desimal = 0.0;
+    untuk i dari 0 sampai panjang(a) {
+        biar d: desimal = a[i] - b[i];
+        s = s + d * d;
+    }
+    kembali akar(s);
+}
+
+// acak-urut indeks 0..n-1 (Fisher-Yates) -> []desimal indeks.
+// dikembalikan sebagai indeks bulat dalam bentuk desimal; pakai bulatDari saat memakai.
+fungsi data_acak_urut(n: bulat): []desimal {
+    biar idx: []desimal = [];
+    untuk i dari 0 sampai n { idx = dorong(idx, desimalDari(i)); }
+    biar i: bulat = n - 1;
+    selama i > 0 {
+        biar j: bulat = acakAngka(0, i + 1);
+        biar tmp: desimal = idx[i];
+        idx[i] = idx[j];
+        idx[j] = tmp;
+        i = i - 1;
+    }
+    kembali idx;
+}
+
+// jumlah contoh untuk porsi latih (sisanya untuk uji).
+fungsi data_batas_latih(n: bulat, porsi: desimal): bulat {
+    kembali bulatDari(desimalDari(n) * porsi);
+}

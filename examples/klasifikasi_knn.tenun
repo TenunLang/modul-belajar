@@ -1,0 +1,16 @@
+// Klasifikasi k-NN pada dua gugus titik 2D.
+// Jalankan: tenun run examples/klasifikasi_knn.tenun
+impor "../src/belajar.tenun";
+
+// kelas 0 di kiri-bawah, kelas 1 di kanan-atas.
+biar X: [][]desimal = [
+    [1.0, 1.0], [1.5, 2.0], [2.0, 1.5], [1.0, 2.0],
+    [8.0, 8.0], [9.0, 7.5], [7.5, 9.0], [8.5, 8.0]
+];
+biar y: []desimal = [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0];
+
+cetak("titik [2,2] -> kelas (harusnya 0):");
+cetak(knn_klasifikasi(X, y, [2.0, 2.0], 3));
+
+cetak("titik [8,8] -> kelas (harusnya 1):");
+cetak(knn_klasifikasi(X, y, [8.0, 8.0], 3));

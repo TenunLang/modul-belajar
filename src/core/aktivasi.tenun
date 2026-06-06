@@ -1,0 +1,50 @@
+// core/aktivasi.tenun
+// Fungsi aktivasi beserta turunannya (untuk backprop).
+// Turunan sigmoid/tanh memakai nilai TERAKTIVASI sebagai masukan.
+
+fungsi akt_sigmoid(x: desimal): desimal {
+    kembali 1.0 / (1.0 + eksp(-x));
+}
+
+// y = akt_sigmoid(x); turunan = y * (1 - y).
+fungsi akt_d_sigmoid(y: desimal): desimal {
+    kembali y * (1.0 - y);
+}
+
+fungsi akt_relu(x: desimal): desimal {
+    kalau x > 0.0 { kembali x; }
+    kembali 0.0;
+}
+
+// turunan ReLU memakai nilai pra-aktivasi x.
+fungsi akt_d_relu(x: desimal): desimal {
+    kalau x > 0.0 { kembali 1.0; }
+    kembali 0.0;
+}
+
+fungsi akt_tanh(x: desimal): desimal {
+    kembali tanh(x);
+}
+
+// y = tanh(x); turunan = 1 - y^2.
+fungsi akt_d_tanh(y: desimal): desimal {
+    kembali 1.0 - y * y;
+}
+
+// softmax numerik-stabil pada satu vektor logit.
+fungsi akt_softmax(v: []desimal): []desimal {
+    biar maks: desimal = v[0];
+    untuk i dari 1 sampai panjang(v) {
+        kalau v[i] > maks { maks = v[i]; }
+    }
+    biar e: []desimal = [];
+    biar jum: desimal = 0.0;
+    untuk i dari 0 sampai panjang(v) {
+        biar ex: desimal = eksp(v[i] - maks);
+        e = dorong(e, ex);
+        jum = jum + ex;
+    }
+    biar r: []desimal = [];
+    untuk i dari 0 sampai panjang(e) { r = dorong(r, e[i] / jum); }
+    kembali r;
+}

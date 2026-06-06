@@ -1,0 +1,83 @@
+// core/regresi.tenun
+// Regresi linear & logistik dengan penurunan gradien (gradient descent).
+//
+// Model direpresentasikan sebagai []desimal panjang (fitur + 1):
+//   model[0]           = bias (intersep)
+//   model[1..fitur+1]  = bobot tiap fitur
+// Karena larik bertipe rujukan, fungsi latih memperbarui model di tempat.
+
+fungsi reg_model_baru(jumlah_fitur: bulat): []desimal {
+    kembali vek_nol(jumlah_fitur + 1);
+}
+
+// --- regresi linear ---
+
+fungsi reg_linear_prediksi(model: []desimal, x: []desimal): desimal {
+    biar s: desimal = model[0];
+    untuk i dari 0 sampai panjang(x) { s = s + model[i + 1] * x[i]; }
+    kembali s;
+}
+
+// X: [][]desimal contoh, y: []desimal target. Kembalikan MSE akhir.
+fungsi reg_linear_latih(model: []desimal, X: [][]desimal, y: []desimal, epok: bulat, laju: desimal): desimal {
+    biar n: bulat = panjang(X);
+    biar nd: desimal = desimalDari(n);
+    biar mse_akhir: desimal = 0.0;
+    untuk e dari 0 sampai epok {
+        biar g0: desimal = 0.0;
+        biar g: []desimal = vek_nol(panjang(model) - 1);
+        biar total: desimal = 0.0;
+        untuk t dari 0 sampai n {
+            biar pred: desimal = reg_linear_prediksi(model, X[t]);
+            biar galat: desimal = pred - y[t];
+            total = total + galat * galat;
+            g0 = g0 + galat;
+            untuk i dari 0 sampai panjang(X[t]) {
+                g[i] = g[i] + galat * X[t][i];
+            }
+        }
+        model[0] = model[0] - laju * (2.0 / nd) * g0;
+        untuk i dari 0 sampai panjang(g) {
+            model[i + 1] = model[i + 1] - laju * (2.0 / nd) * g[i];
+        }
+        mse_akhir = total / nd;
+    }
+    kembali mse_akhir;
+}
+
+// --- regresi logistik (klasifikasi biner) ---
+
+fungsi reg_logistik_prediksi(model: []desimal, x: []desimal): desimal {
+    kembali akt_sigmoid(reg_linear_prediksi(model, x));
+}
+
+// y berisi label 0.0 / 1.0. Kembalikan entropi-silang biner akhir.
+fungsi reg_logistik_latih(model: []desimal, X: [][]desimal, y: []desimal, epok: bulat, laju: desimal): desimal {
+    biar n: bulat = panjang(X);
+    biar nd: desimal = desimalDari(n);
+    biar rugi_akhir: desimal = 0.0;
+    untuk e dari 0 sampai epok {
+        biar g0: desimal = 0.0;
+        biar g: []desimal = vek_nol(panjang(model) - 1);
+        biar eps: desimal = 0.0000001;
+        biar total: desimal = 0.0;
+        untuk t dari 0 sampai n {
+            biar pred: desimal = reg_logistik_prediksi(model, X[t]);
+            biar galat: desimal = pred - y[t];
+            g0 = g0 + galat;
+            untuk i dari 0 sampai panjang(X[t]) {
+                g[i] = g[i] + galat * X[t][i];
+            }
+            biar p: desimal = pred;
+            kalau p < eps { p = eps; }
+            kalau p > 1.0 - eps { p = 1.0 - eps; }
+            total = total - (y[t] * ln(p) + (1.0 - y[t]) * ln(1.0 - p));
+        }
+        model[0] = model[0] - laju * g0 / nd;
+        untuk i dari 0 sampai panjang(g) {
+            model[i + 1] = model[i + 1] - laju * g[i] / nd;
+        }
+        rugi_akhir = total / nd;
+    }
+    kembali rugi_akhir;
+}

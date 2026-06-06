@@ -1,0 +1,57 @@
+// core/klaster.tenun
+// Pengklasteran k-means (pembelajaran tanpa pengawasan).
+
+// Tentukan indeks pusat (centroid) terdekat untuk satu titik.
+fungsi klaster_terdekat(pusat: [][]desimal, x: []desimal): bulat {
+    biar idx: bulat = 0;
+    biar best: desimal = data_jarak(pusat[0], x);
+    untuk c dari 1 sampai panjang(pusat) {
+        biar d: desimal = data_jarak(pusat[c], x);
+        kalau d < best { best = d; idx = c; }
+    }
+    kembali idx;
+}
+
+// Latih k-means: kembalikan k pusat klaster (centroid).
+// Pusat awal diambil dari k contoh pertama.
+fungsi kmeans(X: [][]desimal, k: bulat, iterasi: bulat): [][]desimal {
+    biar dim: bulat = panjang(X[0]);
+    biar n: bulat = panjang(X);
+
+    biar pusat: [][]desimal = [];
+    untuk c dari 0 sampai k { pusat = dorong(pusat, X[c]); }
+
+    untuk it dari 0 sampai iterasi {
+        biar jumlah: [][]desimal = mat_nol(k, dim);
+        biar cacah: []desimal = vek_nol(k);
+
+        untuk t dari 0 sampai n {
+            biar c: bulat = klaster_terdekat(pusat, X[t]);
+            cacah[c] = cacah[c] + 1.0;
+            untuk d dari 0 sampai dim {
+                jumlah[c][d] = jumlah[c][d] + X[t][d];
+            }
+        }
+
+        untuk c dari 0 sampai k {
+            kalau cacah[c] > 0.0 {
+                biar baru: []desimal = [];
+                untuk d dari 0 sampai dim {
+                    baru = dorong(baru, jumlah[c][d] / cacah[c]);
+                }
+                pusat[c] = baru;
+            }
+        }
+    }
+
+    kembali pusat;
+}
+
+// Tugaskan setiap contoh ke indeks klaster terdekat (sebagai label desimal).
+fungsi klaster_tugas(pusat: [][]desimal, X: [][]desimal): []desimal {
+    biar hasil: []desimal = [];
+    untuk t dari 0 sampai panjang(X) {
+        hasil = dorong(hasil, desimalDari(klaster_terdekat(pusat, X[t])));
+    }
+    kembali hasil;
+}

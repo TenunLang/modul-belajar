@@ -1,0 +1,20 @@
+// Melatih MLP menyelesaikan XOR — masalah non-linear klasik.
+// Jalankan: tenun run examples/xor.tenun
+impor "../src/belajar.tenun";
+
+biar X: [][]desimal = [[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]];
+biar Y: [][]desimal = [[0.0], [1.0], [1.0], [0.0]];
+
+biar lapisan: []bulat = [2, 6, 1];
+biar bobot: [][][]desimal = jar_bobot_baru(lapisan, 1.0);
+biar bias: [][]desimal = jar_bias_baru(lapisan);
+
+biar rugi: desimal = jar_latih(bobot, bias, X, Y, 4000, 0.5);
+cetak("rugi akhir:");
+cetak(rugi);
+
+cetak("prediksi (target 0,1,1,0):");
+untuk i dari 0 sampai 4 {
+    biar p: []desimal = jar_prediksi(bobot, bias, X[i]);
+    cetak(p[0]);
+}

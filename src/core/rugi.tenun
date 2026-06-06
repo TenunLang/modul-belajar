@@ -1,0 +1,47 @@
+// core/rugi.tenun
+// Fungsi rugi (loss) beserta gradiennya terhadap prediksi.
+
+// galat kuadrat rata-rata.
+fungsi rugi_mse(pred: []desimal, target: []desimal): desimal {
+    biar s: desimal = 0.0;
+    untuk i dari 0 sampai panjang(pred) {
+        biar d: desimal = pred[i] - target[i];
+        s = s + d * d;
+    }
+    kembali s / desimalDari(panjang(pred));
+}
+
+// gradien MSE terhadap prediksi: 2/n * (pred - target).
+fungsi rugi_mse_grad(pred: []desimal, target: []desimal): []desimal {
+    biar n: desimal = desimalDari(panjang(pred));
+    biar g: []desimal = [];
+    untuk i dari 0 sampai panjang(pred) {
+        g = dorong(g, 2.0 * (pred[i] - target[i]) / n);
+    }
+    kembali g;
+}
+
+// entropi silang biner (target & pred dalam [0,1]).
+fungsi rugi_silang_biner(pred: []desimal, target: []desimal): desimal {
+    biar eps: desimal = 0.0000001;
+    biar s: desimal = 0.0;
+    untuk i dari 0 sampai panjang(pred) {
+        biar p: desimal = pred[i];
+        kalau p < eps { p = eps; }
+        kalau p > 1.0 - eps { p = 1.0 - eps; }
+        s = s - (target[i] * ln(p) + (1.0 - target[i]) * ln(1.0 - p));
+    }
+    kembali s / desimalDari(panjang(pred));
+}
+
+// entropi silang kategorikal untuk keluaran softmax.
+fungsi rugi_silang(pred: []desimal, target: []desimal): desimal {
+    biar eps: desimal = 0.0000001;
+    biar s: desimal = 0.0;
+    untuk i dari 0 sampai panjang(pred) {
+        biar p: desimal = pred[i];
+        kalau p < eps { p = eps; }
+        s = s - target[i] * ln(p);
+    }
+    kembali s;
+}

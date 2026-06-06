@@ -1,0 +1,49 @@
+// core/tetangga.tenun
+// Klasifikasi k-tetangga-terdekat (k-nearest neighbors).
+
+// Klasifikasikan `x` berdasar suara mayoritas dari k tetangga terdekat
+// di data latih (X_latih, y_latih). y berisi label (mis. 0.0, 1.0, 2.0).
+fungsi knn_klasifikasi(X_latih: [][]desimal, y_latih: []desimal, x: []desimal, k: bulat): desimal {
+    biar n: bulat = panjang(X_latih);
+
+    biar jarak: []desimal = [];
+    untuk t dari 0 sampai n { jarak = dorong(jarak, data_jarak(X_latih[t], x)); }
+
+    biar dipakai: []desimal = vek_nol(n);
+    biar terpilih: []desimal = [];
+
+    untuk c dari 0 sampai k {
+        biar idx: bulat = -1;
+        biar best: desimal = 0.0;
+        untuk t dari 0 sampai n {
+            kalau dipakai[t] == 0.0 {
+                kalau idx < 0 || jarak[t] < best {
+                    best = jarak[t];
+                    idx = t;
+                }
+            }
+        }
+        kalau idx >= 0 {
+            dipakai[idx] = 1.0;
+            terpilih = dorong(terpilih, y_latih[idx]);
+        }
+    }
+
+    // suara mayoritas atas label tetangga terpilih.
+    biar label_unik: []desimal = [];
+    biar hitung: []desimal = [];
+    untuk i dari 0 sampai panjang(terpilih) {
+        biar f: bulat = -1;
+        untuk u dari 0 sampai panjang(label_unik) {
+            kalau label_unik[u] == terpilih[i] { f = u; }
+        }
+        kalau f < 0 {
+            label_unik = dorong(label_unik, terpilih[i]);
+            hitung = dorong(hitung, 1.0);
+        } lain {
+            hitung[f] = hitung[f] + 1.0;
+        }
+    }
+
+    kembali label_unik[stat_argmaks(hitung)];
+}

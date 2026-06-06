@@ -1,0 +1,113 @@
+// core/jaringan.tenun
+// Jaringan saraf maju (MLP) dengan propagasi-balik (backpropagation).
+//
+// Representasi:
+//   bobot : [][][]desimal  -> bobot[l] adalah matriks [keluaran_l][masukan_l]
+//   bias  : [][]desimal    -> bias[l]  adalah vektor [keluaran_l]
+// Aktivasi: sigmoid pada setiap lapisan. Rugi: MSE.
+//
+// "lapisan" mendeskripsikan arsitektur, mis. [2, 4, 1]:
+//   2 masukan -> lapisan tersembunyi 4 neuron -> 1 keluaran.
+
+// --- inisialisasi ---
+
+fungsi jar_bobot_baru(lapisan: []bulat, skala: desimal): [][][]desimal {
+    biar bobot: [][][]desimal = [];
+    untuk l dari 0 sampai panjang(lapisan) - 1 {
+        bobot = dorong(bobot, mat_acak(lapisan[l + 1], lapisan[l], skala));
+    }
+    kembali bobot;
+}
+
+fungsi jar_bias_baru(lapisan: []bulat): [][]desimal {
+    biar bias: [][]desimal = [];
+    untuk l dari 0 sampai panjang(lapisan) - 1 {
+        bias = dorong(bias, vek_nol(lapisan[l + 1]));
+    }
+    kembali bias;
+}
+
+// --- propagasi maju ---
+
+// Kembalikan aktivasi tiap lapisan: A[0]=masukan, A[L]=keluaran akhir.
+fungsi jar_maju_simpan(bobot: [][][]desimal, bias: [][]desimal, masukan: []desimal): [][]desimal {
+    biar aktivasi: [][]desimal = [];
+    aktivasi = dorong(aktivasi, masukan);
+    biar a: []desimal = masukan;
+    untuk l dari 0 sampai panjang(bobot) {
+        biar z: []desimal = vek_tambah(mat_kali_vek(bobot[l], a), bias[l]);
+        biar keluar: []desimal = [];
+        untuk j dari 0 sampai panjang(z) {
+            keluar = dorong(keluar, akt_sigmoid(z[j]));
+        }
+        a = keluar;
+        aktivasi = dorong(aktivasi, a);
+    }
+    kembali aktivasi;
+}
+
+fungsi jar_prediksi(bobot: [][][]desimal, bias: [][]desimal, masukan: []desimal): []desimal {
+    biar a: [][]desimal = jar_maju_simpan(bobot, bias, masukan);
+    kembali a[panjang(a) - 1];
+}
+
+// --- propagasi balik (satu contoh, pembaruan SGD di tempat) ---
+
+fungsi jar_latih_satu(bobot: [][][]desimal, bias: [][]desimal, masukan: []desimal, target: []desimal, laju: desimal): desimal {
+    biar L: bulat = panjang(bobot);
+    biar A: [][]desimal = jar_maju_simpan(bobot, bias, masukan);
+    biar keluaran: []desimal = A[L];
+
+    // siapkan wadah delta per lapisan.
+    biar delta: [][]desimal = [];
+    untuk l dari 0 sampai L {
+        delta = dorong(delta, vek_nol(panjang(bobot[l])));
+    }
+
+    // delta lapisan keluaran: (a - target) * sigmoid'(a).
+    untuk o dari 0 sampai panjang(keluaran) {
+        biar d: desimal = (keluaran[o] - target[o]) * akt_d_sigmoid(keluaran[o]);
+        delta[L - 1][o] = d;
+    }
+
+    // rambatkan mundur ke lapisan tersembunyi.
+    biar l: bulat = L - 2;
+    selama l >= 0 {
+        biar wt: [][]desimal = mat_transpos(bobot[l + 1]);
+        biar prop: []desimal = mat_kali_vek(wt, delta[l + 1]);
+        biar a_l: []desimal = A[l + 1];
+        untuk o dari 0 sampai panjang(delta[l]) {
+            delta[l][o] = prop[o] * akt_d_sigmoid(a_l[o]);
+        }
+        l = l - 1;
+    }
+
+    // perbarui bobot & bias: w -= laju * delta_o * a_in ; b -= laju * delta_o.
+    untuk li dari 0 sampai L {
+        biar a_in: []desimal = A[li];
+        untuk o dari 0 sampai panjang(bobot[li]) {
+            untuk i dari 0 sampai panjang(bobot[li][o]) {
+                bobot[li][o][i] = bobot[li][o][i] - laju * delta[li][o] * a_in[i];
+            }
+            bias[li][o] = bias[li][o] - laju * delta[li][o];
+        }
+    }
+
+    kembali rugi_mse(keluaran, target);
+}
+
+// --- loop latih penuh ---
+
+// X: []([]desimal) contoh masukan, Y: []([]desimal) target.
+// Kembalikan rugi rata-rata epok terakhir.
+fungsi jar_latih(bobot: [][][]desimal, bias: [][]desimal, X: [][]desimal, Y: [][]desimal, epok: bulat, laju: desimal): desimal {
+    biar rugi_akhir: desimal = 0.0;
+    untuk e dari 0 sampai epok {
+        biar total: desimal = 0.0;
+        untuk n dari 0 sampai panjang(X) {
+            total = total + jar_latih_satu(bobot, bias, X[n], Y[n], laju);
+        }
+        rugi_akhir = total / desimalDari(panjang(X));
+    }
+    kembali rugi_akhir;
+}

@@ -1,0 +1,114 @@
+// core/matriks.tenun
+// Aljabar linear dasar untuk pembelajaran mesin.
+// vektor = []desimal, matriks = [][]desimal (baris x kolom).
+
+// --- konstruksi ---
+
+fungsi vek_nol(n: bulat): []desimal {
+    biar v: []desimal = [];
+    untuk i dari 0 sampai n { v = dorong(v, 0.0); }
+    kembali v;
+}
+
+fungsi vek_isi(n: bulat, nilai: desimal): []desimal {
+    biar v: []desimal = [];
+    untuk i dari 0 sampai n { v = dorong(v, nilai); }
+    kembali v;
+}
+
+// bobot acak seragam pada rentang [-skala, skala].
+fungsi vek_acak(n: bulat, skala: desimal): []desimal {
+    biar v: []desimal = [];
+    untuk i dari 0 sampai n {
+        v = dorong(v, (acakDesimal() * 2.0 - 1.0) * skala);
+    }
+    kembali v;
+}
+
+fungsi mat_nol(baris: bulat, kolom: bulat): [][]desimal {
+    biar m: [][]desimal = [];
+    untuk i dari 0 sampai baris { m = dorong(m, vek_nol(kolom)); }
+    kembali m;
+}
+
+fungsi mat_acak(baris: bulat, kolom: bulat, skala: desimal): [][]desimal {
+    biar m: [][]desimal = [];
+    untuk i dari 0 sampai baris { m = dorong(m, vek_acak(kolom, skala)); }
+    kembali m;
+}
+
+// --- operasi vektor ---
+
+fungsi vek_dot(a: []desimal, b: []desimal): desimal {
+    biar s: desimal = 0.0;
+    untuk i dari 0 sampai panjang(a) { s = s + a[i] * b[i]; }
+    kembali s;
+}
+
+fungsi vek_tambah(a: []desimal, b: []desimal): []desimal {
+    biar r: []desimal = [];
+    untuk i dari 0 sampai panjang(a) { r = dorong(r, a[i] + b[i]); }
+    kembali r;
+}
+
+fungsi vek_kurang(a: []desimal, b: []desimal): []desimal {
+    biar r: []desimal = [];
+    untuk i dari 0 sampai panjang(a) { r = dorong(r, a[i] - b[i]); }
+    kembali r;
+}
+
+fungsi vek_skalar(a: []desimal, k: desimal): []desimal {
+    biar r: []desimal = [];
+    untuk i dari 0 sampai panjang(a) { r = dorong(r, a[i] * k); }
+    kembali r;
+}
+
+// perkalian elemen-demi-elemen (Hadamard).
+fungsi vek_hadamard(a: []desimal, b: []desimal): []desimal {
+    biar r: []desimal = [];
+    untuk i dari 0 sampai panjang(a) { r = dorong(r, a[i] * b[i]); }
+    kembali r;
+}
+
+fungsi vek_jumlah(a: []desimal): desimal {
+    biar s: desimal = 0.0;
+    untuk i dari 0 sampai panjang(a) { s = s + a[i]; }
+    kembali s;
+}
+
+// --- operasi matriks ---
+
+// matriks (baris x kolom) kali vektor (kolom) -> vektor (baris).
+fungsi mat_kali_vek(m: [][]desimal, v: []desimal): []desimal {
+    biar r: []desimal = [];
+    untuk i dari 0 sampai panjang(m) { r = dorong(r, vek_dot(m[i], v)); }
+    kembali r;
+}
+
+fungsi mat_transpos(m: [][]desimal): [][]desimal {
+    biar baris: bulat = panjang(m);
+    biar kolom: bulat = panjang(m[0]);
+    biar t: [][]desimal = mat_nol(kolom, baris);
+    untuk i dari 0 sampai baris {
+        untuk j dari 0 sampai kolom {
+            t[j][i] = m[i][j];
+        }
+    }
+    kembali t;
+}
+
+// perkalian matriks a (n x m) dengan b (m x p) -> (n x p).
+fungsi mat_kali(a: [][]desimal, b: [][]desimal): [][]desimal {
+    biar n: bulat = panjang(a);
+    biar m: bulat = panjang(b);
+    biar p: bulat = panjang(b[0]);
+    biar hasil: [][]desimal = mat_nol(n, p);
+    untuk i dari 0 sampai n {
+        untuk j dari 0 sampai p {
+            biar s: desimal = 0.0;
+            untuk k dari 0 sampai m { s = s + a[i][k] * b[k][j]; }
+            hasil[i][j] = s;
+        }
+    }
+    kembali hasil;
+}

@@ -1,0 +1,18 @@
+// belajar.tenun — titik masuk modul.
+// Pustaka pembelajaran mesin untuk Tenun: aljabar linear, regresi,
+// jaringan saraf (MLP + backprop), k-NN, dan k-means.
+//
+// Pakai:  impor "belajar";
+// Semua fungsi (mat_*, vek_*, akt_*, rugi_*, jar_*, reg_*, knn_*, kmeans,
+// klaster_*, stat_*, data_*) langsung tersedia.
+
+impor "./utils/stat.tenun";
+impor "./utils/data.tenun";
+
+impor "./core/matriks.tenun";
+impor "./core/aktivasi.tenun";
+impor "./core/rugi.tenun";
+impor "./core/jaringan.tenun";
+impor "./core/regresi.tenun";
+impor "./core/tetangga.tenun";
+impor "./core/klaster.tenun";
