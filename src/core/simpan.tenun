@@ -1,0 +1,94 @@
+// core/simpan.tenun
+// Persistensi model: simpan bobot/bias jaringan ke berkas, lalu muat kembali.
+// Latih sekali -> simpan -> muat -> pakai untuk inferensi (mis. OCR).
+//
+// Format berkas (teks, 3 baris):
+//   baris 1: arsitektur lapisan, mis. "784,64,10"
+//   baris 2: semua nilai bobot (row-major, antar-lapisan), dipisah koma
+//   baris 3: semua nilai bias, dipisah koma
+
+// Simpan bobot & bias ke `path`. Arsitektur diturunkan dari bentuk bobot.
+fungsi jar_simpan(bobot: [][][]desimal, bias: [][]desimal, path: teks): kosong {
+    biar lap_t: []teks = [];
+    lap_t = dorong(lap_t, keTeks(panjang(bobot[0][0])));
+    untuk l dari 0 sampai panjang(bobot) {
+        lap_t = dorong(lap_t, keTeks(panjang(bobot[l])));
+    }
+
+    biar wt: []teks = [];
+    untuk l dari 0 sampai panjang(bobot) {
+        untuk o dari 0 sampai panjang(bobot[l]) {
+            untuk i dari 0 sampai panjang(bobot[l][o]) {
+                wt = dorong(wt, teksDari(bobot[l][o][i]));
+            }
+        }
+    }
+
+    biar bt: []teks = [];
+    untuk l dari 0 sampai panjang(bias) {
+        untuk o dari 0 sampai panjang(bias[l]) {
+            bt = dorong(bt, teksDari(bias[l][o]));
+        }
+    }
+
+    biar isi: teks = gabung(lap_t, ",") + "\n" + gabung(wt, ",") + "\n" + gabung(bt, ",");
+    tulisFile(path, isi);
+}
+
+// Baca arsitektur ([]bulat) dari berkas model.
+fungsi jar_muat_lapisan(path: teks): []bulat {
+    biar isi: teks = bacaFile(path);
+    biar baris: []teks = pisah(isi, "\n");
+    biar lap_t: []teks = pisah(baris[0], ",");
+    biar lapisan: []bulat = [];
+    untuk i dari 0 sampai panjang(lap_t) {
+        lapisan = dorong(lapisan, bulatDari(keDesimal(lap_t[i])));
+    }
+    kembali lapisan;
+}
+
+// Muat bobot dari berkas model.
+fungsi jar_muat_bobot(path: teks): [][][]desimal {
+    biar isi: teks = bacaFile(path);
+    biar baris: []teks = pisah(isi, "\n");
+    biar lapisan: []bulat = jar_muat_lapisan(path);
+    biar nilai: []teks = pisah(baris[1], ",");
+
+    biar bobot: [][][]desimal = [];
+    untuk l dari 0 sampai panjang(lapisan) - 1 {
+        bobot = dorong(bobot, mat_nol(lapisan[l + 1], lapisan[l]));
+    }
+
+    biar idx: bulat = 0;
+    untuk l dari 0 sampai panjang(bobot) {
+        untuk o dari 0 sampai panjang(bobot[l]) {
+            untuk i dari 0 sampai panjang(bobot[l][o]) {
+                bobot[l][o][i] = keDesimal(nilai[idx]);
+                idx = idx + 1;
+            }
+        }
+    }
+    kembali bobot;
+}
+
+// Muat bias dari berkas model.
+fungsi jar_muat_bias(path: teks): [][]desimal {
+    biar isi: teks = bacaFile(path);
+    biar baris: []teks = pisah(isi, "\n");
+    biar lapisan: []bulat = jar_muat_lapisan(path);
+    biar nilai: []teks = pisah(baris[2], ",");
+
+    biar bias: [][]desimal = [];
+    untuk l dari 0 sampai panjang(lapisan) - 1 {
+        bias = dorong(bias, vek_nol(lapisan[l + 1]));
+    }
+
+    biar idx: bulat = 0;
+    untuk l dari 0 sampai panjang(bias) {
+        untuk o dari 0 sampai panjang(bias[l]) {
+            bias[l][o] = keDesimal(nilai[idx]);
+            idx = idx + 1;
+        }
+    }
+    kembali bias;
+}

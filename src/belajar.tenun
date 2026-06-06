@@ -16,3 +16,4 @@ impor "./core/jaringan.tenun";
 impor "./core/regresi.tenun";
 impor "./core/tetangga.tenun";
 impor "./core/klaster.tenun";
+impor "./core/simpan.tenun";

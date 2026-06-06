@@ -1,0 +1,28 @@
+// OCR digit: MUAT model tersimpan, lalu kenali glyph (termasuk versi berderau).
+// Jalankan dulu ocr_latih.tenun. Lalu: tenun run examples/ocr_kenali.tenun
+impor "../src/belajar.tenun";
+
+biar bobot: [][][]desimal = jar_muat_bobot("model_digit.txt");
+biar bias: [][]desimal = jar_muat_bias("model_digit.txt");
+cetak("model dimuat.");
+
+// glyph "3" bersih.
+biar tiga: []desimal = data_dari_pola([
+    "####.", "....#", "....#", ".###.", "....#", "....#", "####."
+]);
+cetak("kenali '3':");
+cetak(stat_argmaks(jar_prediksi(bobot, bias, tiga)));
+
+// glyph "7" dengan satu piksel berderau (baris ke-4 berubah).
+biar tujuh: []desimal = data_dari_pola([
+    "#####", "....#", "...#.", "..##.", ".#...", ".#...", ".#..."
+]);
+cetak("kenali '7' berderau:");
+cetak(stat_argmaks(jar_prediksi(bobot, bias, tujuh)));
+
+// glyph "5" bersih.
+biar lima: []desimal = data_dari_pola([
+    "#####", "#....", "####.", "....#", "....#", "#...#", ".###."
+]);
+cetak("kenali '5':");
+cetak(stat_argmaks(jar_prediksi(bobot, bias, lima)));

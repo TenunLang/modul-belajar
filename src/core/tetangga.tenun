@@ -29,7 +29,6 @@ fungsi knn_klasifikasi(X_latih: [][]desimal, y_latih: []desimal, x: []desimal, k
         }
     }
 
-    // suara mayoritas atas label tetangga terpilih.
     biar label_unik: []desimal = [];
     biar hitung: []desimal = [];
     untuk i dari 0 sampai panjang(terpilih) {

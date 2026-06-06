@@ -35,6 +35,39 @@ untuk i dari 0 sampai 4 {
 }
 ```
 
+## Simpan & muat model (latih sekali, pakai berkali-kali)
+
+```tenun
+// --- skrip latih ---
+jar_latih(bobot, bias, X, Y, 3000, 0.5);
+jar_simpan(bobot, bias, "model.txt");      // simpan bobot+bias ke berkas
+
+// --- skrip inferensi (proses terpisah) ---
+biar bobot: [][][]desimal = jar_muat_bobot("model.txt");
+biar bias: [][]desimal = jar_muat_bias("model.txt");
+biar tebak: bulat = stat_argmaks(jar_prediksi(bobot, bias, contoh));
+```
+
+Format berkas teks: baris 1 arsitektur (mis. `35,24,10`), baris 2 semua bobot, baris 3 semua bias.
+
+## OCR digit (klasifikasi karakter dari piksel)
+
+OCR = klasifikasi karakter dari vektor piksel. `data_dari_pola` mengubah pola
+gambar (`'#'` = piksel aktif) menjadi masukan classifier.
+
+```tenun
+biar tiga: []desimal = data_dari_pola([
+    "####.", "....#", "....#", ".###.", "....#", "....#", "####."
+]);
+biar bobot: [][][]desimal = jar_muat_bobot("model_digit.txt");  // model terlatih
+biar bias: [][]desimal = jar_muat_bias("model_digit.txt");
+cetak(stat_argmaks(jar_prediksi(bobot, bias, tiga)));            // -> 3
+```
+
+Lihat `examples/ocr_latih.tenun` (latih + simpan 10 digit) dan
+`examples/ocr_kenali.tenun` (muat model + kenali, termasuk glyph berderau).
+Berkas `model_digit.txt` terlatih sudah disertakan — `ocr_kenali` bisa langsung jalan.
+
 ## Contoh: regresi linear
 
 ```tenun

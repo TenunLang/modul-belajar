@@ -1,0 +1,48 @@
+// OCR digit: latih MLP mengenali angka 0-9 dari pola piksel 7x5,
+// lalu SIMPAN model ke berkas. Jalankan: tenun run examples/ocr_latih.tenun
+impor "../src/belajar.tenun";
+
+// 10 glyph digit, masing-masing 7 baris x 5 kolom ('#' = piksel aktif).
+biar digit: [][]teks = [
+    [".###.", "#...#", "#...#", "#...#", "#...#", "#...#", ".###."],
+    ["..#..", ".##..", "..#..", "..#..", "..#..", "..#..", ".###."],
+    [".###.", "#...#", "....#", "...#.", "..#..", ".#...", "#####"],
+    ["####.", "....#", "....#", ".###.", "....#", "....#", "####."],
+    ["...#.", "..##.", ".#.#.", "#..#.", "#####", "...#.", "...#."],
+    ["#####", "#....", "####.", "....#", "....#", "#...#", ".###."],
+    [".###.", "#....", "#....", "####.", "#...#", "#...#", ".###."],
+    ["#####", "....#", "...#.", "..#..", ".#...", ".#...", ".#..."],
+    [".###.", "#...#", "#...#", ".###.", "#...#", "#...#", ".###."],
+    [".###.", "#...#", "#...#", ".####", "....#", "....#", ".###."]
+];
+
+// bangun dataset: X = piksel (35), Y = one-hot (10).
+biar X: [][]desimal = [];
+biar Y: [][]desimal = [];
+untuk d dari 0 sampai 10 {
+    X = dorong(X, data_dari_pola(digit[d]));
+    Y = dorong(Y, data_satu_panas(d, 10));
+}
+
+biar lapisan: []bulat = [35, 24, 10];
+biar bobot: [][][]desimal = jar_bobot_baru(lapisan, 0.5);
+biar bias: [][]desimal = jar_bias_baru(lapisan);
+
+cetak("melatih...");
+biar rugi: desimal = jar_latih(bobot, bias, X, Y, 3000, 0.5);
+cetak("rugi akhir:");
+cetak(rugi);
+
+// akurasi pada data latih.
+biar tebak: []desimal = [];
+biar asli: []desimal = [];
+untuk d dari 0 sampai 10 {
+    biar keluar: []desimal = jar_prediksi(bobot, bias, X[d]);
+    tebak = dorong(tebak, desimalDari(stat_argmaks(keluar)));
+    asli = dorong(asli, desimalDari(d));
+}
+cetak("akurasi latih:");
+cetak(stat_akurasi(tebak, asli));
+
+jar_simpan(bobot, bias, "model_digit.txt");
+cetak("model disimpan: model_digit.txt");

@@ -38,3 +38,20 @@ fungsi data_acak_urut(n: bulat): []desimal {
 fungsi data_batas_latih(n: bulat, porsi: desimal): bulat {
     kembali bulatDari(desimalDari(n) * porsi);
 }
+
+// Ubah pola gambar (baris berisi '#'=piksel aktif, lainnya kosong) menjadi
+// vektor piksel [0.0/1.0] yang diratakan -> masukan classifier OCR.
+fungsi data_dari_pola(pola: []teks): []desimal {
+    biar v: []desimal = [];
+    untuk r dari 0 sampai panjang(pola) {
+        biar baris: teks = pola[r];
+        untuk c dari 0 sampai panjangTeks(baris) {
+            kalau potong(baris, c, 1) == "#" {
+                v = dorong(v, 1.0);
+            } lain {
+                v = dorong(v, 0.0);
+            }
+        }
+    }
+    kembali v;
+}
